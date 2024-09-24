@@ -1,0 +1,57 @@
+clear;
+clc;
+G=generateQ(2,2);
+G1=judgereplace(G);
+G2=nummtostrm(G);
+[U,V]=matrixtoV(G1);
+G3=mvterrepstrv(G2,V);
+% M=cell2sym(G3)
+v= sdpvar(1,31);
+u=sdpvar(1,9);
+M=sdpvar(15,15);
+
+for e=1:15
+    for f=1:15
+        M(e,e)=1;
+        if (e~=f)
+            for p=1:31
+                if(strcmp(G2{e,f},V(p)))
+                    M(e,f)=v(p);
+                else for q=2:9
+                        if(strcmp(G2{e,f},U(q)))
+                            M(e,f)=u(q);
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+M
+
+
+
+    A1=u(2);
+    A2=u(3);
+    A1B1=u(4);
+    A1B2=u(5);
+    A2B1=u(6);
+    A2B2=u(7);
+    B1=u(8);
+    B2=u(9);
+% id=find(ismember(V,'A1A2B2B1'))
+% % obj = -(A1B1+A1B2+A2B1-A2B2);
+obj=1/32*(8+sqrt(2)*(2*A2B1+v(24)-A2B2-2*v(8)-v(13)+v(9)+2*(2*A1B1-v(20)+A1B2))-2*(2*v(16)-2*v(17)));
+% obj=1/32*(8+sqrt(2)*(2*A2B1+v(61)-A2B2-2*v(21)-v(28)+v(22)+2*(2*A1B1-v(55)+A1B2))-2*(2*v(40)-2*v(41)));
+F = [M>=0; u<=1; u>=-1,v>=-1;v<=1;2.6==A1B1+A1B2+A2B1-A2B2];
+sol = optimize(F,obj); 
+obj
+
+
+% A=[1 1;1 2;1 1;1 1;1 2;1 1;1 1]
+% % A=[1 1;1 2]
+% generateMatrix(generateMatrix(A))
+
+A=[1 1;2 2;2 1]
+B=[1 1;2 2;2 1]
+generateMatrix(generateMatrix([A;B]));
